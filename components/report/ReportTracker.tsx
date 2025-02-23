@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-// import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Search, Loader } from "lucide-react";
 
 interface ReportDetails {
@@ -21,7 +21,7 @@ export function ReportTracker() {
   const [reportDetails, setReportDetails] = useState<ReportDetails | null>(
     null
   );
-  // const { data: session } = useSession();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,14 +36,13 @@ export function ReportTracker() {
     }
 
     try {
-      const response = await fetch(`/api/reports/${reportId}`);
+      const response = await fetch(`/api/reports/${reportId}/details`);
       if (!response.ok) {
-        setError("Failed to fetch report");
-        return;
+        throw new Error("Report not found");
       }
       const data = await response.json();
       setReportDetails(data);
-    } catch {
+    } catch (err) {
       setError("Unable to find report. Please check the ID and try again.");
     } finally {
       setLoading(false);
